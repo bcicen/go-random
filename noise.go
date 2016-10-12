@@ -38,7 +38,7 @@ func (g *GoRand) rng() {
 	for {
 		i := rand.Intn(255)
 		g.noise <- []byte(string(i))
-		time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond)
+		time.Sleep(time.Duration(rand.Intn(100)) * time.Microsecond)
 	}
 }
 
@@ -80,7 +80,10 @@ func (g *GoRand) handler(conn net.Conn) {
 
 func main() {
 	g := &GoRand{make(stream)}
-	g.addSource("/dev/input/mice")
-	g.addSource("/dev/input/event4")
+	if len(os.Args) > 1 {
+		for _, a := range os.Args[1:] {
+			g.addSource(a)
+		}
+	}
 	g.run("/tmp/rand.sock")
 }
